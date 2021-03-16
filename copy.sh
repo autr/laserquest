@@ -1,1 +1,1 @@
-rm -rf docs && mv build/ laserquest
+rm -rf laserquest && mv build/ laserquest && cp .nojekyll ./laserquest

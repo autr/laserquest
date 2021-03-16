@@ -3,7 +3,7 @@
 	"version": "1.0.0",
 	"scripts": {
 		"dev": "svelte-kit dev & node-sass src/global.sass static/global.css -w",
-		"build": "svelte-kit build && ./copy.sh",
+		"build": "svelte-kit build && rm -rf laserquest && mv build/ laserquest && cp .nojekyll ./laserquest",
 		"start": "svelte-kit start"
 	},
 	"devDependencies": {
