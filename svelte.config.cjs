@@ -6,8 +6,8 @@ module.exports = {
 		adapter: '@sveltejs/adapter-static',
 		target: '#svelte',
 		paths: {
-			assets: '/docs', // or docs or ./docs
-			base: '/docs' // or docs or ./docs
+			assets: '/laserquest', 
+			base: '/laserquest'
 		}
 	}
 };

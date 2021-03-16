@@ -1,1 +1,1 @@
-rm -rf docs && mv build/ docs
+rm -rf docs && mv build/ laserquest
