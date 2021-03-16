@@ -18,7 +18,7 @@
 			combine: makerjs.model.combine,
 		}
 
-	});
+	})
 
 
 	function ui( value, name, unit, min, max, step  ) {
@@ -47,20 +47,20 @@
 
 
 	let conf = {
-		width: ui( 120, 'box width', MM),
-		height: ui( 120, 'box height', MM),
-		depth: ui( 120, 'box depth', MM),
-		thickness: ui( 15, 'material thickness', MM, 0, 20),
-		tabs: ui( 5, 'side tabs count', NUM),
-		offset: ui( 0.5, 'side tabs offset', NUM, 0, 1, 0.1),
+		width: ui( 145, 'box width', MM, 20),
+		height: ui( 145, 'box height', MM, 20),
+		depth: ui( 145, 'box depth', MM, 20),
+		thickness: ui( 5, 'material thickness', MM, 0, 20),
+		tabs: ui( 9, 'side tabs count', NUM, 0),
+		offset: ui( 1, 'side tabs offset', NUM, 0, 2, 0.05),
 		overhang: ui( 5, 'panel overhang', MM, 2),
-		slot: ui( 0, 'panel slots', NUM ),
-		size: ui( 10, 'panel slot size', MM )
+		slot: ui( 0, 'panel slots', NUM, 0 ),
+		size: ui( 10, 'panel slot size', MM, 0 )
 	}
 
 	const HOLES = {
-		diameter: ui( 5, 'hole diameter', MM ),
-		offset: ui( 20, 'hole offset', MM, 0),
+		diameter: ui( 3, 'hole diameter', MM ),
+		offset: ui( 60, 'hole offset', MM, 0),
 		count: ui( 4, 'hole amount', NUM, 1 ),
 		rotate: ui( 0, 'rotation', DEG )
 	}
@@ -71,7 +71,7 @@
 
 
 
-	function svg( conf ) {
+	function svg( conf, els ) {
 
 		function path( m ) {
 
@@ -125,11 +125,10 @@
 				models: {
 					rect: new maker.rectangle(ww,hh) 
 				},
-				origin: [xx - overhang, mod ? 0 : middle + d + (t * 2)]
+				origin: [xx - overhang + t, mod ? 0 : middle + d + (t * 2)]
 			}
 
 			let rot = i%2 == 0
-
 			
 			const www = size + t
 			let corner = {
@@ -184,11 +183,14 @@
 
 		})
 
-		w = conf.width.value + t
+
+		// left, front, back, right
 
 		ss.forEach( (s, i) => {
 
-			const ww = (i%2 == 0) ? h : w
+			let ww = ((i%2 == 0) ? h : w)
+
+			ww += t // REMOVE THIS
 
 			let m = {
 				models: {
@@ -198,7 +200,7 @@
 			}
 
 			const seg = d / (tabs / 2 )
-			for (let i = 0; i < ( tabs / 2 ) ; i++ ) {
+			for (let i = 0; i < ( tabs / 2 ) + 1 ; i++ ) {
 				const x = m.origin[0]
 				const y = seg * i
 				const hh = seg / 2
@@ -242,6 +244,8 @@
 
 			let flip = tabs%2 != 0
 
+			// panel slots...
+
 			let slots = [
 				{
 					x: x,
@@ -278,23 +282,28 @@
 			slots.forEach( (cc,ii) => {
 
 
-				const first = ii < 2
-				const odd = ii%2 == 0
-
-				if (first && !even && !full) cc.x += t
-				if (!first && !even && zero) cc.x += t
-				if (first && even && !full) cc.x += t
-				if (!first && even && !zero) cc.x += t
-
-				if (!odd) cc.x -= size - t
-
 				const ba = cc.x + cc.w == ww + x
 				const bb = cc.x == x
 
 				if (ba || bb) {
 					cc.w += t
-					if (!odd) cc.x -= t
+					if (ii%2 != 0) cc.x -= size // righthand
+				} else {
+					cc.x -= size
+					cc.w += size + (t-size)
+
 				}
+
+				const first = ii < 2
+				const odd = ii%2 == 0
+
+				// if (first && !even && !full) cc.x += t
+				// if (!first && !even && zero) cc.x += t
+				// if (first && even && !full) cc.x += t
+				// if (!first && even && !zero) cc.x += t
+
+				// if (!odd) cc.x -= size - t
+
 
 
 				const r = maker.move(
@@ -319,19 +328,36 @@
 			x += ww + t
 		}) 
 
+		let paths = {}
 
-		els.forEach( el => {
+		els.forEach( (el, idx) => {
 			const tar = el.target.value
 			const all = { ...sides, ...faces }
 			const rr = all[tar]
 			const bb = makerjs.measure.modelExtents( rr )
-			console.log('>>>>', tar, rr, bb)
+			const count = el.count.value
+			const center = bb.center
+			let deg = 360 / count
+
+			console.log(bb)
+			for (let i = 0; i < count;i++) {
+				const cir = { 
+					type: 'circle', 
+					origin: center,
+					radius: el.diameter.value
+				}
+				const k = 'circle-' + idx + '-' + i
+
+				maker.move( cir, [el.offset.value + center[0], center[1]])
+
+				let rot = el.rotate.value + (i * deg)
+
+				makerjs.path.rotate( cir, rot, center )
+				paths[k] = cir
+			}
 		})
-
-		console.log( '?', sides, faces )
 		
-
-		return maker.svg( { 
+		final = { 
 			models: { 
 				sides: {
 					models: sides,
@@ -340,10 +366,15 @@
 				faces: {
 					models: faces
 				}
-			} 
-		})
+			},
+			paths
+		} 
+
+		return maker.svg( final )
 
 	}
+
+	let final
 
 
 	function onKeyUp( e, t ) {
@@ -363,12 +394,35 @@
 		els = []
 		arr.push({
 			target: ui( targets.top, 'target', TARGET),
-			...type
+			...JSON.parse( JSON.stringify( type ) )
 		})
 		els = arr
 	}
 
 	addElement( HOLES )
+	addElement( HOLES )
+
+	els[1].diameter.value = 50
+	els[1].offset.value = 0
+	els[1].count.value = 1
+
+	function download( op, ext ) {
+
+		const file = makerjs.exporter[op]( final, {
+			units: 'mm'
+		}) 
+
+		let el = document.createElement('a')
+		el.setAttribute('href', 'data:text/plaincharset=utf-8,' + encodeURIComponent(file))
+		el.setAttribute('download', `boxinator.${ext}`)
+
+		el.style.display = 'none'
+		document.body.appendChild(el)
+
+		el.click()
+
+		document.body.removeChild(el)
+	}
 </script>
 
 <main>
@@ -395,17 +449,16 @@
 			{/each}
 		</aside>
 
-		<section class="p1 grow flex column-center-center">
-			{@html makerjs ? svg( conf ) : '' }
-
+		<section class="p1 grow flex column-center-center rel">
+			<div class="flex abs t1 r1">
+				<button on:click={e => download('toSVG', 'svg') }>SVG</button>
+				<button on:click={e => download('toDXF', 'dxf') }>DXF</button>
+				<button on:click={e => download('toOpenJsCad', 'ojscad') }>JSCAD</button>
+			</div>
+			{@html makerjs ? svg( conf, els ) : '' }
 		</section>
 
 		<aside class={sidebar}>
-<!-- 
-	const MM = 'mm'
-	const NUM = 'num'
-	const DEG = 'deg'
-	const TARGET = 'target' -->
 			{#each els as el}
 				{#each Object.entries(el) as [key, value]}
 					<fieldset >
@@ -415,11 +468,13 @@
 						</div>
 
 						{#if value.unit == TARGET }
-							<select>
-								{#each Object.entries(targets) as [k, v]}
-									<option value={k} name={k}>{v}</option>
-								{/each}
-							</select>
+							<div class="select">
+								<select bind:value={el[key].value}>
+									{#each Object.entries(targets) as [k, v]}
+										<option value={k} name={k}>{v}</option>
+									{/each}
+								</select>
+							</div>
 						{:else}
 
 							<input 
