@@ -1,5 +1,7 @@
-svg path {
-  stroke: var(--color); }
+svg {
+  padding: 8em; }
+  svg path {
+    stroke: var(--color); }
 
 body, html, main, #svelte {
   overflow-y: hidden;

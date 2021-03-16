@@ -3,7 +3,7 @@
 	"version": "1.0.0",
 	"scripts": {
 		"dev": "svelte-kit dev & node-sass src/global.sass static/global.css -w",
-		"build": "svelte-kit build",
+		"build": "svelte-kit build && ./copy.sh",
 		"start": "svelte-kit start"
 	},
 	"devDependencies": {

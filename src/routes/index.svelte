@@ -525,7 +525,7 @@
 <main>
 
 	<div class="flex row-stretch-stretch h100vh overflow-hidden">
-		<aside class={sidebar + ' maxw230px'}>
+		<aside class={sidebar + ' maxw230px bg-b'}>
 			<div>
 				{#each Object.entries(conf) as [key, value]}
 					{#if value.title}
@@ -554,6 +554,7 @@
 				<button class="filled w100pc" on:click={e => download('toSVG', 'svg') }>SVG</button>
 				<button class="filled w100pc" on:click={e => download('toDXF', 'dxf') }>DXF</button>
 				<button class="filled w100pc" on:click={e => download('toOpenJsCad', 'ojscad') }>JSCAD</button>
+				<a href="https://autr.tv" target="_blank">autr.tv</a>
 			</div>
 		</aside>
 
@@ -564,7 +565,7 @@
 			</div>
 		</section>
 
-		<aside class={sidebar + ' maxw320px'}>
+		<aside class={sidebar + ' maxw320px bg-a'}>
 			{#each els as el, i}
 				<div class="bb1-solid">
 					<div class="mtb1 flex row-space-between-flex-start">
@@ -612,7 +613,7 @@
 
 			{/each}
 			<div class="cmt1">
-				<button class="grow filled" on:click={e => addElement( HOLES )}>
+				<button class="grow filled w100pc" on:click={e => addElement( HOLES )}>
 					add hole(s)
 				</button>
 			</div>

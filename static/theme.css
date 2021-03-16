@@ -18,21 +18,21 @@
 	--font-size: 13px;
 	--line-height: 1.61803398875em;
 
-	--bg: hsl( 200, 10%, 10% );
+	--bg: hsl( 250, 20%, 14% );
+	--bg-a: hsl( 250, 20%, 17% );
+	--bg-b: hsl( 250, 20%, 17% );
 	--bg-pop: hsl( 200, 10%, 12% );
 	--bg-sink: hsl( 200, 10%, 8% );
 
-	--color: hsl( 200, 10%, 75% );
+	--color: hsl( 200, 80%, 90% );
 	--color-bright: hsl( 200, 10%, 95% );
-	--color-fade: hsl( 200, 10%, 50% );
+	--color-fade: hsl( 40, 80%, 80% );
 
 	--color-success: hsl( 150, 95%, 70% );
 	--color-info: hsl( 200, 95%, 70% );
 	--color-error: hsl( 340, 95%, 70% );
 	--color-alert: hsl( 50, 95%, 70% );
 
-	--bg-a: hsl( 300, 20%, 10% );
-	--bg-b: hsl( 300, 20%, 15% );
 	--bg-c: hsl( 300, 20%, 20% );
 	--bg-d: hsl( 300, 20%, 25% );
 	--bg-e: hsl( 300, 20%, 30% );
