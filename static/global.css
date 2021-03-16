@@ -1,2 +1,6 @@
 svg path {
   stroke: var(--color); }
+
+body, html, main, #svelte {
+  overflow-y: hidden;
+  height: 100vh; }

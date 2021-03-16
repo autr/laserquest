@@ -2,8 +2,10 @@ dependencies:
   '@flatten-js/core': 1.2.20
   makerjs: 0.17.0
   paper: 0.12.12
+  rison: 0.1.1
 devDependencies:
   '@sveltejs/adapter-node': 1.0.0-next.7
+  '@sveltejs/adapter-static': 1.0.0-next.3
   '@sveltejs/kit': 1.0.0-next.49_svelte@3.35.0+vite@2.1.0
   sass: 1.32.8
   svelte: 3.35.0
@@ -42,9 +44,13 @@ packages:
     dev: true
     resolution:
       integrity: sha512-5lwBlZZcmrD0g2Ta3hbv9YxOLsngEC2c5Ce8zgpTFcHjuBdKXIBV3djJbrfFkSIUKuOG4057WzlLGlk0wWS14w==
+  /@sveltejs/adapter-static/1.0.0-next.3:
+    dev: true
+    resolution:
+      integrity: sha512-EMAfguRzJsEleAVIqcOkHmsV+ht/iWnTiZucnyAtOiVNqQ6Iyyskfmq8ewGpXVdfcZ03t4v6W/vKtyLe28K02w==
   /@sveltejs/kit/1.0.0-next.49_svelte@3.35.0+vite@2.1.0:
     dependencies:
-      '@svitejs/vite-plugin-svelte': 0.11.0_svelte@3.35.0+vite@2.1.0
+      '@svitejs/vite-plugin-svelte': 0.11.1_svelte@3.35.0+vite@2.1.0
       cheap-watch: 1.0.3
       sade: 1.7.4
       svelte: 3.35.0
@@ -56,7 +62,7 @@ packages:
       vite: ^2.1.0
     resolution:
       integrity: sha512-1/yqqtCuZWuE7e3yAxW7HhzHXb01GqiDLLXrryZKROkUrWuG5u75nVqgvDBoWEshpFx4+f+IvF1T7OWFnxrNww==
-  /@svitejs/vite-plugin-svelte/0.11.0_svelte@3.35.0+vite@2.1.0:
+  /@svitejs/vite-plugin-svelte/0.11.1_svelte@3.35.0+vite@2.1.0:
     dependencies:
       '@rollup/pluginutils': 4.1.0
       chalk: 4.1.0
@@ -66,16 +72,16 @@ packages:
       slash: 3.0.0
       source-map: 0.7.3
       svelte: 3.35.0
-      svelte-hmr: 0.13.0-2_svelte@3.35.0
+      svelte-hmr: 0.13.1_svelte@3.35.0
       vite: 2.1.0
     dev: true
     engines:
       node: '>=12.0.0'
     peerDependencies:
       svelte: ^3.35.0
-      vite: ^2.0.5
+      vite: ^2.1.0
     resolution:
-      integrity: sha512-Zeha2eeFHUyHvyd1pqK+e5NfTeZ9zwgYSGd4fOMK/GN9iTKNhGighxWAibafE/Bh2V1JC3JEvqc+nxK+PyQE2Q==
+      integrity: sha512-G4UCAyRvbqr/3RuRrWib7iPZPMBmDgk7kvgCn0js76TGS2NaVce5AoWjWgPR0M5z71P9SBH77e3N/pO70ziBNw==
   /@types/bezier-js/0.0.6:
     dev: false
     resolution:
@@ -402,6 +408,10 @@ packages:
     dev: true
     resolution:
       integrity: sha512-wENBPt4ySzg4ybFQW2TT1zMQucPK95HSh/nq2CFTZVOGut2+pQvSsgtda4d26YrYcr067wjbmzOG8byDPBX63A==
+  /rison/0.1.1:
+    dev: false
+    resolution:
+      integrity: sha1-TcwFV7JBr/YOdheOd5ITVxPzMSA=
   /rollup/2.41.2:
     dev: true
     engines:
@@ -462,14 +472,14 @@ packages:
       node: '>=8'
     resolution:
       integrity: sha512-qpCAvRl9stuOHveKsn7HncJRvv501qIacKzQlO/+Lwxc9+0q2wLyv4Dfvt80/DPn2pqOBsJdDiogXGR9+OvwRw==
-  /svelte-hmr/0.13.0-2_svelte@3.35.0:
+  /svelte-hmr/0.13.1_svelte@3.35.0:
     dependencies:
       svelte: 3.35.0
     dev: true
     peerDependencies:
       svelte: '>=3.19.0'
     resolution:
-      integrity: sha512-3Sqxbs5hG212oweKhHzh2S7jVScylzbVXuEkydgdS9NpvcdnyCSufpaJSUNxUGc02wgjWugtqaJXs1DybAjRpw==
+      integrity: sha512-dv71eRBhtb/Q0I9db8ss2DjualeFFwEQQ97jpIUWJeX3W/xfFm7FZEWUa+92q5wPXvTZglN2mC+X4nzBuBVXcg==
   /svelte-preprocess/4.6.9_sass@1.32.8+svelte@3.35.0:
     dependencies:
       '@types/pug': 2.0.4
@@ -551,9 +561,11 @@ packages:
 specifiers:
   '@flatten-js/core': ^1.2.20
   '@sveltejs/adapter-node': next
+  '@sveltejs/adapter-static': ^1.0.0-next.3
   '@sveltejs/kit': next
   makerjs: ^0.17.0
   paper: ^0.12.12
+  rison: ^0.1.1
   sass: ^1.0.0
   svelte: ^3.29.0
   svelte-preprocess: ^4.0.0

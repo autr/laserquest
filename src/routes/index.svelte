@@ -1,8 +1,11 @@
 <script>
 	import { onMount } from 'svelte'
+	import rison from 'rison'
 
 	let makerjs
 	let maker
+
+	let save = false
 
 	onMount(async () => {
 
@@ -18,17 +21,55 @@
 			combine: makerjs.model.combine,
 		}
 
+
+		try {
+			const hash = '('+window.location.hash.substring(1) + ')'
+			const obj = rison.decode(hash)
+
+			for (const [key, value] of Object.entries(obj.conf)) {
+				if (key in conf && value != null) conf[key].value = value
+			}
+			els = []
+			obj.els.forEach( (el, i) => {
+
+				const neu = addElement( el.name )
+				for (const [key, value] of Object.entries(el.props)) {
+					if (key in neu.props && value != null) neu.props[key].value = value
+				}
+			})
+
+
+		} catch(err) {
+			console.warn('error decoding URI, skipping:', err.message)
+
+			addElement( HOLES )
+			addElement( HOLES )
+
+			els[1].props.diameter.value = 50
+			els[1].props.offset.value = 0
+			els[1].props.count.value = 1
+
+		}
+
+
+
 	})
 
+	// let mm = 332
+ //  	let px = screen.width
 
-	function ui( value, name, unit, min, max, step  ) {
+
+
+
+	function ui( value, name, unit, min, max, step, title ) {
 		return {
 			value,
 			name,
 			min,
 			max,
 			step,
-			unit
+			unit,
+			title
 		}
 	}
 	const MM = 'mm'
@@ -47,27 +88,35 @@
 
 
 	let conf = {
-		width: ui( 145, 'box width', MM, 20),
-		height: ui( 145, 'box height', MM, 20),
-		depth: ui( 145, 'box depth', MM, 20),
-		thickness: ui( 5, 'material thickness', MM, 0, 20),
-		tabs: ui( 9, 'side tabs count', NUM, 0),
-		offset: ui( 1, 'side tabs offset', NUM, 0, 2, 0.05),
-		overhang: ui( 5, 'panel overhang', MM, 2),
-		slot: ui( 0, 'panel slots', NUM, 0 ),
-		size: ui( 10, 'panel slot size', MM, 0 )
+		screen: ui( 1, 'zoom', NUM, 1, null, null),
+		width: ui( 145, 'width', MM, 20, null, null, 'box'),
+		height: ui( 145, 'height', MM, 20),
+		depth: ui( 145, 'depth', MM, 20),
+		thickness: ui( 5, 'thickness', MM, 0, 20),
+		tabs: ui( 9, 'tabs', NUM, 0, null, null, 'sides'),
+		offset: ui( 1, 'offset', NUM, 0, 2, 0.05),
+		overhang: ui( 5, 'overhang', MM, 2, null, null, 'panel'),
+		// slot: ui( 0, 'slots', NUM, 0 ),
+		size: ui( 10, 'size', MM, 0 )
 	}
 
-	const HOLES = {
-		diameter: ui( 3, 'hole diameter', MM ),
-		offset: ui( 60, 'hole offset', MM, 0),
-		count: ui( 4, 'hole amount', NUM, 1 ),
-		rotate: ui( 0, 'rotation', DEG )
+	const HOLES = 'hole(s)'
+
+	const elements = {
+
+		[HOLES]: {
+
+			name: HOLES,
+			props: {
+				diameter: ui( 3, 'hole diameter', MM ),
+				offset: ui( 60, 'hole offset', MM, 0),
+				count: ui( 4, 'hole amount', NUM, 1 ),
+				rotate: ui( 0, 'rotation', DEG )
+			}
+		}
 	}
 
-	let els = [
-
-	]
+	let els = []
 
 
 
@@ -98,19 +147,23 @@
 
 		let ss = ['left', 'front', 'right', 'back']
 
-		const t = conf.thickness.value
-		const d = conf.depth.value
-		const tabs = conf.tabs.value
-		const size = conf.size.value
-		const slot = conf.slot.value
+		const t = conf.thickness.value || 1
+		const d = conf.depth.value || 1
+		const tabs = conf.tabs.value || 1
+		const size = conf.size.value || 1
+		// const slot = conf.slot.value || 1
 		const offset = parseFloat( conf.offset.value ) || 0
-		const overhang = conf.overhang.value
+		const overhang = conf.overhang.value || 1
 
-		let w = conf.width.value
-		const h = conf.height.value
+		let w = conf.width.value || 1
+		let h = conf.height.value || 1
+
+		w += t
+		h += t
+
 		let x = 0
 		const y = h
-		const middle = h + (overhang * 2) + (t * 2)
+		const middle = h + (overhang * 2) + (t * 3)
 
 		let faces = {}
 
@@ -119,8 +172,8 @@
 			let xx = h + t
 			const mod = i%2 == 0
 			const oo = overhang * 2
-			const ww = w + oo
-			const hh = h + oo
+			const ww = w + oo + t
+			const hh = h + oo + t
 			let face = {
 				models: {
 					rect: new maker.rectangle(ww,hh) 
@@ -190,7 +243,7 @@
 
 			let ww = ((i%2 == 0) ? h : w)
 
-			ww += t // REMOVE THIS
+			ww += t 
 
 			let m = {
 				models: {
@@ -254,9 +307,9 @@
 					h: t + 1
 				},
 				{
-					x: x + ww - (t * 2),
+					x: x + ww - (t * 2) + t,
 					y: -t,
-					w: size,
+					w: size - t,
 					h: t + 1
 				},
 				{
@@ -266,9 +319,9 @@
 					h: t + 1
 				},
 				{
-					x: x + ww - (t * 2),
+					x: x + ww - (t * 2) + t,
 					y: d - 1,
-					w: size,
+					w: size - t,
 					h: t + 1
 				}
 			]
@@ -305,7 +358,6 @@
 				// if (!odd) cc.x -= size - t
 
 
-
 				const r = maker.move(
 					new maker.rectangle( cc.w, cc.h),
 					[cc.x,cc.y]
@@ -323,6 +375,8 @@
 
 			m = clean( m, 0, 0 )
 
+			m.origin = [0,middle]
+
 			sides[s] = m
 
 			x += ww + t
@@ -331,37 +385,50 @@
 		let paths = {}
 
 		els.forEach( (el, idx) => {
-			const tar = el.target.value
-			const all = { ...sides, ...faces }
-			const rr = all[tar]
-			const bb = makerjs.measure.modelExtents( rr )
-			const count = el.count.value
-			const center = bb.center
-			let deg = 360 / count
+			const targs = el.props.target.value
 
-			console.log(bb)
-			for (let i = 0; i < count;i++) {
-				const cir = { 
-					type: 'circle', 
-					origin: center,
-					radius: el.diameter.value
+
+			Object.keys(targs).forEach( key => {
+
+				const b = targs[key]
+				const all = { ...sides, ...faces }
+				const rect = all[key]
+				const diameter = el.props.diameter.value || 1
+				const offset = el.props.offset.value || 0
+				const rotate = el.props.rotate.value || 0
+				const count = el.props.count.value || 1
+
+				if (!b || !rect) return
+
+				const bb = makerjs.measure.modelExtents( rect )
+				const center = bb.center
+				let deg = 360 / count
+
+				console.log('bounding box ~', key, bb.width, bb.height)
+
+				for (let i = 0; i < count;i++) {
+					const cir = { 
+						type: 'circle', 
+						origin: center,
+						radius: diameter
+					}
+					const k = 'circle-' + key + '-' + idx + '-' + i
+
+					maker.move( cir, [offset + center[0], center[1]])
+
+					let rot = rotate + (i * deg)
+
+					makerjs.path.rotate( cir, rot, center )
+					paths[k] = cir
 				}
-				const k = 'circle-' + idx + '-' + i
-
-				maker.move( cir, [el.offset.value + center[0], center[1]])
-
-				let rot = el.rotate.value + (i * deg)
-
-				makerjs.path.rotate( cir, rot, center )
-				paths[k] = cir
-			}
+			})
 		})
+
 		
 		final = { 
 			models: { 
 				sides: {
-					models: sides,
-					origin: [0,middle]
+					models: sides
 				}, 
 				faces: {
 					models: faces
@@ -369,6 +436,31 @@
 			},
 			paths
 		} 
+
+
+		makerjs.model.mirror( final, true, true )
+
+		if (save) {
+
+	 
+			try {
+
+				let uri = { conf: {}, els: [] }
+
+				Object.keys(conf).forEach( k => uri.conf[k] = conf[k].value )
+				els.forEach( el => {
+					let o = { props: {}, name: el.name }
+					Object.keys(el.props).forEach( k => o.props[k] = el.props[k].value )
+					uri.els.push(o)
+				})
+				window.location.hash = rison.encode_object(uri);
+
+			} catch(err) {
+				console.warn('error encoding URI, skipping:', err.message)
+			}
+		}
+
+		save = true
 
 		return maker.svg( final )
 
@@ -381,30 +473,22 @@
 		if (e.keyCode === 13) e.target.blur()
 	}
 
-	$: total = {
-		width: ( conf.depth * 2 ) + conf.width,
-		height: ( conf.height * 2 ) + ( conf.depth * 2)
-	}
 
-	let sidebar = 'minw220px h100vh overflow-auto flex column-stretch-flex-start p1'
+	let sidebar = 'h100vh overflow-auto flex column-stretch-space-between p1'
 
 
 	function addElement( type ) {
 		const arr = els
 		els = []
-		arr.push({
-			target: ui( targets.top, 'target', TARGET),
-			...JSON.parse( JSON.stringify( type ) )
-		})
+		let ob = {}
+		Object.keys(targets).map( k => ob[k] = false )
+		ob.top = true
+		let o = JSON.parse( JSON.stringify( elements[type] ) )
+		o.props.target = ui( ob, 'target', TARGET)
+		arr.push(o)
 		els = arr
+		return arr[arr.length-1]
 	}
-
-	addElement( HOLES )
-	addElement( HOLES )
-
-	els[1].diameter.value = 50
-	els[1].offset.value = 0
-	els[1].count.value = 1
 
 	function download( op, ext ) {
 
@@ -423,79 +507,113 @@
 
 		document.body.removeChild(el)
 	}
+
+	function onCheck( i, a, b, v ) {
+
+
+
+	}
+
+	function removeEl( i ) {
+		let st = els
+		els = []
+		st.splice(i,1)
+		els = st
+	}
 </script>
 
 <main>
 
-	<div class="flex row-stretch-stretch">
-		<aside class={sidebar}>
-			{#each Object.entries(conf) as [key, value]}
-				<fieldset >
-					<div class="mtb1">
-						{value.name}
-						<span class="fade">({value.unit})</span>
-					</div>
-
-					<input 
-						on:keyup={onKeyUp} 
-						type="number" 
-						min={value.min}
-						max={value.max}
-						step={value.step || 1}
-						bind:value={conf[key].value} 
-						placeholder="width" />
-				</fieldset>
-
-			{/each}
-		</aside>
-
-		<section class="p1 grow flex column-center-center rel">
-			<div class="flex abs t1 r1">
-				<button on:click={e => download('toSVG', 'svg') }>SVG</button>
-				<button on:click={e => download('toDXF', 'dxf') }>DXF</button>
-				<button on:click={e => download('toOpenJsCad', 'ojscad') }>JSCAD</button>
-			</div>
-			{@html makerjs ? svg( conf, els ) : '' }
-		</section>
-
-		<aside class={sidebar}>
-			{#each els as el}
-				{#each Object.entries(el) as [key, value]}
-					<fieldset >
-						<div class="mtb1">
+	<div class="flex row-stretch-stretch h100vh overflow-hidden">
+		<aside class={sidebar + ' maxw230px'}>
+			<div>
+				{#each Object.entries(conf) as [key, value]}
+					{#if value.title}
+						<div class="mb1 bt1-solid pt1"># {value.title}</div>
+					{/if}
+					<fieldset class="flex mb1 minw200px">
+						<div class="w120px">
 							{value.name}
 							<span class="fade">({value.unit})</span>
 						</div>
 
-						{#if value.unit == TARGET }
-							<div class="select">
-								<select bind:value={el[key].value}>
-									{#each Object.entries(targets) as [k, v]}
-										<option value={k} name={k}>{v}</option>
-									{/each}
-								</select>
-							</div>
-						{:else}
-
-							<input 
-								on:keyup={onKeyUp} 
-								type="number" 
-								min={value.min}
-								max={value.max}
-								step={value.step || 1}
-								bind:value={el[key].value} 
-								placeholder="width">
-
-						{/if}
-
+						<input 
+							on:keyup={onKeyUp} 
+							class="grow"
+							type="number" 
+							min={value.min}
+							max={value.max}
+							step={value.step || 1}
+							bind:value={conf[key].value} 
+							placeholder="width" />
 					</fieldset>
 
 				{/each}
+			</div>
+			<div class="cmb1">
+				<button class="filled w100pc" on:click={e => download('toSVG', 'svg') }>SVG</button>
+				<button class="filled w100pc" on:click={e => download('toDXF', 'dxf') }>DXF</button>
+				<button class="filled w100pc" on:click={e => download('toOpenJsCad', 'ojscad') }>JSCAD</button>
+			</div>
+		</aside>
+
+		<section 
+			class="overflow-auto p1 grow flex column-center-center rel">
+			<div style={`transform: scale( ${conf.screen.value} ); transform-origin: 0 0`}>	
+				{@html makerjs ? svg( conf, els ) : '' }
+			</div>
+		</section>
+
+		<aside class={sidebar + ' maxw320px'}>
+			{#each els as el, i}
+				<div class="bb1-solid">
+					<div class="mtb1 flex row-space-between-flex-start">
+						<div>#{i+1} {el.name}</div>
+						<button on:click={ e => removeEl(i) } class="cross w1em"></button>
+					</div>
+					{#each Object.entries(el.props) as [key, value]}  
+						<fieldset class="flex mb1 minw280px ">
+							<div class="w160px">
+								{value.name}
+								<span class="fade">({value.unit})</span>
+							</div>
+
+							{#if value.unit == TARGET }
+								<div>
+									{#each Object.entries(targets) as [k, v]}
+										<label class="checkbox relative">
+											<input 
+												type="checkbox"
+												on:change={ e => onCheck( i, key, k, els[i].props[key].value[k]) }
+												bind:checked={els[i].props[key].value[k]}>
+											<span></span>
+											{v}
+										</label>
+									{/each}
+								</div>
+							{:else}
+
+								<input 
+									class="grow"
+									on:keyup={onKeyUp} 
+									type="number" 
+									min={value.min}
+									max={value.max}
+									step={value.step || 1}
+									bind:value={els[i].props[key].value} 
+									placeholder="width">
+
+							{/if}
+
+						</fieldset>
+
+					{/each}
+				</div>
 
 			{/each}
 			<div class="cmt1">
-				<button on:click={e => addElement( HOLES )}>
-					add holes
+				<button class="grow filled" on:click={e => addElement( HOLES )}>
+					add hole(s)
 				</button>
 			</div>
 		</aside>
