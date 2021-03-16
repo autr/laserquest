@@ -1,4 +1,4 @@
-[Launch App](https://autr.github.io/boxinator)
+[Launch App](https://autr.github.io/laserquest)
 
 
-[![boxinator](app.png)](https://autr.github.io/boxinator)
+[![laserquest](app.png)](https://autr.github.io/laserquest)
