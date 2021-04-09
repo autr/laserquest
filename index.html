@@ -6,29 +6,46 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		
 
-<style data-svelte>undefined</style>
 
-<link rel="modulepreload" href="/laserquest/_app/start-6141f225.js">
-			<link rel="modulepreload" href="/laserquest/_app/chunks/preload-helper-922df9d2.js">
-			<link rel="modulepreload" href="/laserquest/_app/pages/index.svelte-91649393.js">
-			<link rel="modulepreload" href="/laserquest/_app/chunks/index-c0ad8402.js">
+
+<link rel="modulepreload" href="/laserquest/_app/start-03467a08.js">
+			<link rel="modulepreload" href="/laserquest/_app/chunks/vendor-72a2eff2.js">
+			<link rel="modulepreload" href="/laserquest/_app/chunks/preload-helper-9f12a5fd.js">
+			<link rel="modulepreload" href="/laserquest/_app/pages/index.svelte-afb46f2d.js">
+			<link rel="modulepreload" href="/laserquest/_app/chunks/index-074cc37d.js">
 			<link rel="stylesheet" href="/laserquest/_app/assets/start-a8cd1609.css">
 
 
 		<script type="module">
-			import { start } from "/laserquest/_app/start-6141f225.js";
+			import { start } from "/laserquest/_app/start-03467a08.js";
 			start({
 				target: document.querySelector("#svelte"),
+				paths: {"base":"/laserquest/","assets":"/laserquest"},
+				session: {},
 				host: location.host,
-				paths: {"base":"/laserquest","assets":"/laserquest"},
-				status: 200,
-				error: null,
-				session: void 0
+				route: true,
+				hydrate: {
+					status: 200,
+					error: null,
+					nodes: [
+						import("/laserquest/_app/pages/index.svelte-afb46f2d.js")
+					],
+					page: {
+						host: location.host, // TODO this is redundant
+						path: "/",
+						query: new URLSearchParams(""),
+						params: {}
+					}
+				}
 			});
 		</script>
 		<link rel="stylesheet" href="theme.css">
 		<link rel="stylesheet" href="all.min.css">
 		<link rel="stylesheet" href="global.css">
+		<script type="text/javascript">
+			var _paq=window._paq=window._paq||[];_paq.push(["trackPageView"]),_paq.push(["enableLinkTracking"]),function(){var a="//matomo.sinnott.cc/";_paq.push(["setTrackerUrl",a+"matomo.php"]),_paq.push(["setSiteId","1"]);var e=document,t=e.createElement("script"),p=e.getElementsByTagName("script")[0];t.type="text/javascript",t.async=!0,t.src=a+"matomo.js",p.parentNode.insertBefore(t,p)}();
+		</script>
+
 	</head>
 	<body>
 		<div id="svelte">
